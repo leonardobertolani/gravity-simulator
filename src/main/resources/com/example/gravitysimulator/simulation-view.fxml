@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gravitysimulator.SimulatorWindowController">
+   <center>
+      <AnchorPane fx:id="simulationPane" prefHeight="232.0" prefWidth="377.0" style="-fx-background-color: #031517;" BorderPane.alignment="CENTER">
+         <children>
+            <Canvas fx:id="drawCanvas" height="595.0" width="1000.0" />
+         </children></AnchorPane>
+   </center>
+   <top>
+      <SplitPane orientation="VERTICAL" prefHeight="74.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <items>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="265.99998474121094" minWidth="10.0" prefWidth="300.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="223.00004069010413" minWidth="4.666659037272126" prefWidth="175.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="186.99998474121094" minWidth="0.0" prefWidth="175.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="266.66661071777344" minWidth="10.0" prefWidth="175.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="175.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Button fx:id="simulationButton" mnemonicParsing="false" onAction="#onSimulate" prefHeight="30.0" prefWidth="150.0" text="Simulate" GridPane.columnIndex="4" />
+                  <Button mnemonicParsing="false" onAction="#onAddNewObject" prefHeight="30.0" prefWidth="150.0" text="Add object" GridPane.columnIndex="1" />
+                  <Button mnemonicParsing="false" onAction="#onAddNewSeries" prefHeight="30.0" prefWidth="150.0" text="Add series" GridPane.columnIndex="2" />
+                  <Button mnemonicParsing="false" onAction="#restartSimulation" prefHeight="30.0" prefWidth="150.0" text="Reset" GridPane.columnIndex="3" />
+                  <ChoiceBox fx:id="chCurve" prefHeight="30.0" prefWidth="250.0" />
+               </children>
+            </GridPane>
+         </items>
+      </SplitPane>
+   </top>
+</BorderPane>
