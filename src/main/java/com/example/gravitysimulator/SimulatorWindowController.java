@@ -10,7 +10,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
 import javafx.stage.Modality;
 
 import java.io.IOException;
@@ -18,27 +18,53 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 /*
 
-TO DO
+IDEE
 
-- nella finestra di generazione di una pallina aggiungi il tasto annulla e apply
-- scrivi la funzione per la generazione sfasata e usala anche per add series
+- implementa una finestra per la creazione di oggetti colorati, con nome e informazioni da poter visualizzare all'occorrenza
+- crea una finestra di visualizzazione statistiche, in cui si mostra magari info come la forza risultante di ogni particella, la sua velocità e altro
+- implementa funzionalità di particelle "di prova", cioè che sono soggette al campo ma non lo producono a loro volta
+- implementa slider per modificare G
+- tracciante colorato per i pianeti
+
+- controllo maggiore sugli oggetti a disposizione: settare nome, massa, velocità, colore, poterle cambiare durante l'esecuzione, eliminare
+
+FUNZIONALITA':
+- Slider per agire su G
+- Pianeti per ottenere la lista degli oggetti e modificarli
+- funzione SETTINGS per modificare in un colpo solo G, vedere la lista dei pianeti con tableView e modificarli, attivare o disattivare il tracciante colore
+- funzione STATUS per visualizzare qualche informazione fisica indipendente sulla simulazione attuale, come il centro di massa, i secondi dall'inizio simulazione
  */
 
 public class SimulatorWindowController {
+
+    /* ------------------ CENTER VARIABLES --------------- */
     @FXML private AnchorPane simulationPane;
     @FXML private Canvas drawCanvas;
+
+
+
+    /* -------------- RIGHT SIDE VARIABLES ---------------- */
+    @FXML private Canvas planetCanvas;
+    @FXML private Label planetNameLabel;
+    @FXML private Label planetPositionLabel;
+    @FXML private Label planetVelocityLabel;
+    @FXML private Slider radiusSlider;
+    @FXML private Slider massSlider;
+
+
+
+    /* -------------- LEFT SIDE VARIABLES -------------- */
     @FXML private Button simulationButton;
-
-
 
 
     List<PlanetSprite> physicalObjects;
     List<PlanetSprite> initialObjectConfiguration;
+    int selectedPlanetIndex;
     AnimationTimer timer;
     boolean isSimulating;
+
 
     /**
      * First method of the simulation program. It is used to
@@ -86,12 +112,40 @@ public class SimulatorWindowController {
         gc.setStroke(Color.WHITE);
 
 
-        physicalObjects.add(new PlanetSprite(Color.CYAN, new PVector(200, 150), new PVector(0, 0), 10));
-        physicalObjects.add(new PlanetSprite(Color.ORANGE, new PVector(900, 500), new PVector(0, 0), 10));
+        //physicalObjects.add(new PlanetSprite("ef", Color.CYAN, 10, new PVector(400, 300), new PVector(0, 1), 100));
+        //physicalObjects.add(new PlanetSprite("gnof", Color.ORANGE, 10, new PVector(600, 300), new PVector(0, -1), 100));
+        //physicalObjects.add(new PlanetSprite(Color.GREEN, new PVector(300, 200), new PVector(0, 0), 200));
+        //physicalObjects.add(new PlanetSprite(Color.YELLOW, new PVector(500, 200), new PVector(-1, 0), 100));
+        //physicalObjects.add(new PlanetSprite(Color.GREEN, new PVector(800, 400), new PVector(-1, 0.33333), 5));
+        //selectedPlanet = physicalObjects.get(0);
 
-        simulationPane.getChildren().addAll(physicalObjects);
+        // Generating and adding a default object
+        PlanetSprite newObject = new PlanetSprite("AlphaCentauri", Color.GOLDENROD, 30, new PVector(300, 300), new PVector(0, 0), 200);
+        newObject.setOnMouseClicked(event -> {
+            selectedPlanetIndex = physicalObjects.indexOf((PlanetSprite) event.getSource());
+            System.out.println(selectedPlanetIndex);
+            updatePlanetInfo();
 
-        physicalObjects.forEach(PlanetSprite::display);
+        });
+        selectedPlanetIndex = 0;
+
+        generateDefaultPhysicalObject(newObject);
+
+        newObject = new PlanetSprite(newObject);
+        initialObjectConfiguration.add(newObject);
+
+
+        // Initialising the sliders
+        radiusSlider.valueProperty().addListener(((observable, oldValue, newValue) -> {
+            if(physicalObjects.size() != 0) {
+                physicalObjects.get(selectedPlanetIndex).setRadius(newValue.doubleValue());
+            }
+        }));
+        massSlider.valueProperty().addListener(((observable, oldValue, newValue) -> {
+            if (physicalObjects.size() != 0) {
+                physicalObjects.get(selectedPlanetIndex).setMass(newValue.doubleValue());
+            }
+        }));
 
     }
 
@@ -103,25 +157,36 @@ public class SimulatorWindowController {
         physicalObjects.forEach(s -> {
             s.update();
             s.display();
-            System.out.println(s.getAcceleration());
-            //System.out.println("energia totale: " + (s.getVelocity().y*s.getVelocity().y + simulationPane.getHeight() - s.getLocation().y));
+            updatePlanetInfo();
         });
         applyGravitationalForce(physicalObjects);
+        //initialObjectConfiguration.forEach(s -> System.out.println(s));
+    }
 
 
+    /**
+     * Function called when the user clicks on a planet
+     */
+    public void updatePlanetInfo() {
+
+        this.planetNameLabel.setText(physicalObjects.get(selectedPlanetIndex).getName());
+        this.planetCanvas.getGraphicsContext2D().setFill(((Shape)physicalObjects.get(selectedPlanetIndex).getView()).getFill());
+        this.planetCanvas.getGraphicsContext2D().fillOval(50, 50, 100, 100);
+        this.planetPositionLabel.setText(String.format("Position: (x: %.2f, y: %.2f)", physicalObjects.get(selectedPlanetIndex).getLocation().x, drawCanvas.getHeight() - physicalObjects.get(selectedPlanetIndex).getLocation().y));
+        this.planetVelocityLabel.setText(String.format("Velocity: (x: %.2f, y: %.2f)", physicalObjects.get(selectedPlanetIndex).getVelocity().x, -physicalObjects.get(selectedPlanetIndex).getVelocity().y));
+        this.radiusSlider.setValue(physicalObjects.get(selectedPlanetIndex).getRadius());
+        this.massSlider.setValue(physicalObjects.get(selectedPlanetIndex).getMass());
 
     }
 
     private void applyGravitationalForce(List<PlanetSprite> sprites) {
 
-        PVector totalForce = new PVector(0, 0);
+        PVector totalForce = new PVector();
         for(PlanetSprite first : sprites) {
 
             totalForce.set(0, 0, 0);
             for(PlanetSprite second : sprites) {
-                totalForce = PVector.add(totalForce, first.computeGravitationalForce(second));
-                System.out.println("grav force: " + first.computeGravitationalForce(second));
-                System.out.println("total force: " + totalForce);
+                totalForce.set(totalForce.add(first.computeGravitationalForce(second)));
             }
 
             first.applyImpulseForce(totalForce);
@@ -146,18 +211,14 @@ public class SimulatorWindowController {
         stopSimulation();
         restoreObjects();
 
-        /*
-        physicalObjects.clear();
-        for (BouncingSprite bouncingSprite : initialObjectConfiguration) {
-            physicalObjects.add(new BouncingSprite(bouncingSprite));
-
-        }
-
-         */
-
-
-
     }
+
+
+
+
+    /* ---------------------------------- LEFT SIDE PANEL ---------------------------- */
+
+
 
     @FXML
     void onSimulate() {
@@ -171,9 +232,33 @@ public class SimulatorWindowController {
     }
 
 
+    public void restoreObjects() {
+
+        List<PlanetSprite> newLink = new ArrayList<>();
+
+        for(PlanetSprite b : initialObjectConfiguration) {
+            PlanetSprite newObject = new PlanetSprite(b);
+            newObject.setOnMouseClicked(event -> {
+                selectedPlanetIndex = physicalObjects.indexOf((PlanetSprite) event.getSource());
+                System.out.println(selectedPlanetIndex);
+                updatePlanetInfo();
+            });
+            newLink.add(newObject);
+        }
+
+        physicalObjects.clear();
+        simulationPane.getChildren().clear();
+        simulationPane.getChildren().add(drawCanvas);
+
+        physicalObjects.addAll(newLink);
+        simulationPane.getChildren().addAll(newLink);
+
+        physicalObjects.forEach(s -> s.display());
+    }
+
+
     @FXML
     public void onAddNewObject() {
-        /*
 
         try {
             stopSimulation();
@@ -183,7 +268,9 @@ public class SimulatorWindowController {
             AddObjectController controller = loader.getController();
 
             // Initialize the object inside the dialog pane
-            controller.initialize(curveCanvas);
+            controller.setPlanet(new PlanetSprite());
+            controller.initialize(drawCanvas);
+
 
             // Create the dialog
             Dialog<ButtonType> dialog = new Dialog<>();
@@ -198,10 +285,19 @@ public class SimulatorWindowController {
 
             // Add new object to the Lists
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                //if(controller.getNewObject().isPresent()) {
-                //BouncingSprite.generateDefaultPhysicalObject(simulationPane, physicalObjects, controller.getNewObject().get());
-                generateDefaultPhysicalObject(controller.getNewObject());
-                initialObjectConfiguration.add(controller.getNewObject());
+                // Adding the new object to the arrayLists and setting the mouse listener
+                PlanetSprite newObject = controller.getNewObject();
+                newObject.setOnMouseClicked(event -> {
+                    selectedPlanetIndex = physicalObjects.indexOf((PlanetSprite) event.getSource());
+                    System.out.println(selectedPlanetIndex);
+                    updatePlanetInfo();
+                });
+
+                generateDefaultPhysicalObject(newObject);
+
+                // Adding a new reference of the object to the initial configuration set
+                newObject = controller.getNewObject();
+                initialObjectConfiguration.add(newObject);
                 //}
 
             }
@@ -210,54 +306,7 @@ public class SimulatorWindowController {
             e.printStackTrace();
         }
 
-         */
     }
-
-
-    @FXML
-    public void onAddNewSeries() {
-        /*
-
-        try {
-            stopSimulation();
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("add-series-view.fxml"));
-            DialogPane view = loader.load();
-            AddSeriesController controller = loader.getController();
-
-            // Initialize the object inside the dialog pane
-            controller.initialize(curveCanvas);
-
-            // Create the dialog
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("New Object");
-            dialog.initModality(Modality.WINDOW_MODAL);
-            dialog.setDialogPane(view);
-
-
-            // Show the dialog and wait until the user closes it
-            Optional<ButtonType> clickedButton = dialog.showAndWait();
-
-            // Add new object to the Lists
-            if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                //if(controller.getNewObject().isPresent()) {
-                //BouncingSprite.generateDefaultPhysicalObject(simulationPane, physicalObjects, controller.getNewObject().get());
-                //generateDefaultPhysicalObjectSeries(simulationPane, physicalObjects, initialObjectConfiguration, controller.getNewSeries());
-                controller.getNewSeries().forEach(this::generateDefaultPhysicalObject);
-                initialObjectConfiguration.addAll(controller.getNewSeries());
-                //initialObjectConfiguration.forEach(s -> System.out.println(s));
-                //}
-
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-         */
-    }
-
-
 
 
     public void generateDefaultPhysicalObject(PlanetSprite sprite) {
@@ -266,36 +315,48 @@ public class SimulatorWindowController {
         sprite.display();
     }
 
-    public void restoreObjects() {
-        /*
-        physicalObjects.clear();
-        simulationPane.getChildren().clear();
 
-        physicalObjects.addAll(initialObjectConfiguration);
-        simulationPane.getChildren().addAll(initialObjectConfiguration);
 
-        physicalObjects.forEach(Sprite::display);
 
-         */
-        List<PlanetSprite> newLink = new ArrayList<>();
-        //newLink.add(new BouncingSprite());
+    /* --------------------------------------- RIGHT SIDE PANEL ----------------------------------------- */
 
-        for(PlanetSprite b : initialObjectConfiguration) {
-            newLink.add(new PlanetSprite(b));
+
+
+    @FXML
+    public void onDeletePlanet() {
+
+        if(physicalObjects.size() > 0) {
+            physicalObjects.remove(selectedPlanetIndex);
+            initialObjectConfiguration.remove(selectedPlanetIndex);
+            simulationPane.getChildren().remove(selectedPlanetIndex + 1);
+
+            // By default, we select back the first one
+            selectedPlanetIndex = 0;
+
+            if (physicalObjects.size() == 0) {
+                // If it's empty, we must set the right panel to its initial value
+                this.planetNameLabel.setText("Name");
+                this.planetCanvas.getGraphicsContext2D().clearRect(0, 0, this.planetCanvas.getWidth(), this.planetCanvas.getHeight());
+                this.planetPositionLabel.setText("Position: ");
+                this.planetVelocityLabel.setText("Velocity: ");
+                this.radiusSlider.setValue(this.radiusSlider.minProperty().getValue());
+                this.massSlider.setValue(this.massSlider.minProperty().getValue());
+            }
+            else {
+                updatePlanetInfo();
+            }
+
         }
 
-        //System.out.println("newLink: " + newLink.get(0).hashCode());
+    }
 
-        physicalObjects.clear();
-        simulationPane.getChildren().clear();
-        simulationPane.getChildren().add(drawCanvas);
 
-        physicalObjects.addAll(newLink);
-        simulationPane.getChildren().addAll(newLink);
+    public void tracePlanets() {
+        physicalObjects.forEach(s -> {
+            if(s.isTracing()) {
 
-        //System.out.println("physicalObjects: " + physicalObjects.get(0).hashCode());
-        //System.out.println("simulationPane: " + simulationPane.getChildren().get(1).hashCode());
-        physicalObjects.forEach(s -> s.display());
+            }
+        });
     }
 
 }

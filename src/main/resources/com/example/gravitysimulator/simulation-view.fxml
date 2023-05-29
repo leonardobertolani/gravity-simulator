@@ -2,44 +2,51 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gravitysimulator.SimulatorWindowController">
-   <center>
-      <AnchorPane fx:id="simulationPane" prefHeight="232.0" prefWidth="377.0" style="-fx-background-color: #031517;" BorderPane.alignment="CENTER">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="647.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gravitysimulator.SimulatorWindowController">
+   <left>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="TOP_RIGHT">
          <children>
-            <Canvas fx:id="drawCanvas" height="595.0" width="1000.0" />
-         </children></AnchorPane>
-   </center>
-   <top>
-      <SplitPane orientation="VERTICAL" prefHeight="74.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-         <items>
-            <GridPane>
-              <columnConstraints>
-                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="265.99998474121094" minWidth="10.0" prefWidth="300.0" />
-                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="223.00004069010413" minWidth="4.666659037272126" prefWidth="175.0" />
-                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="186.99998474121094" minWidth="0.0" prefWidth="175.0" />
-                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="266.66661071777344" minWidth="10.0" prefWidth="175.0" />
-                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="175.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+            <Button fx:id="simulationButton" layoutX="25.0" layoutY="70.0" mnemonicParsing="false" onAction="#onSimulate" prefHeight="30.0" prefWidth="150.0" text="Simulate" />
+            <Button layoutX="25.0" layoutY="190.0" mnemonicParsing="false" onAction="#onAddNewObject" prefHeight="30.0" prefWidth="150.0" text="Add Planet" />
+            <Button layoutX="25.0" layoutY="250.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Planet List" />
+            <Button layoutX="25.0" layoutY="130.0" mnemonicParsing="false" onAction="#restartSimulation" prefHeight="30.0" prefWidth="150.0" text="Reset" />
+         </children>
+      </AnchorPane>
+   </left>
+   <center>
+      <SplitPane dividerPositions="0.7170308967596082" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane fx:id="simulationPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: #222;">
                <children>
-                  <Button fx:id="simulationButton" mnemonicParsing="false" onAction="#onSimulate" prefHeight="30.0" prefWidth="150.0" text="Simulate" GridPane.columnIndex="4" />
-                  <Button mnemonicParsing="false" onAction="#onAddNewObject" prefHeight="30.0" prefWidth="150.0" text="Add object" GridPane.columnIndex="1" />
-                  <Button mnemonicParsing="false" onAction="#onAddNewSeries" prefHeight="30.0" prefWidth="150.0" text="Add series" GridPane.columnIndex="2" />
-                  <Button mnemonicParsing="false" onAction="#restartSimulation" prefHeight="30.0" prefWidth="150.0" text="Reset" GridPane.columnIndex="3" />
-                  <ChoiceBox fx:id="chCurve" prefHeight="30.0" prefWidth="250.0" />
+                  <Canvas fx:id="drawCanvas" height="647.0" width="632.0" />
                </children>
-            </GridPane>
-         </items>
+            </AnchorPane>
+            <AnchorPane prefHeight="597.0" prefWidth="163.0">
+               <children>
+                  <Label fx:id="planetNameLabel" layoutX="22.0" layoutY="30.0" text="Name">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Canvas fx:id="planetCanvas" height="200.0" layoutX="22.0" layoutY="67.0" width="200.0" />
+                  <Label fx:id="planetPositionLabel" layoutX="22.0" layoutY="282.0" text="Position" />
+                  <Label fx:id="planetVelocityLabel" layoutX="22.0" layoutY="312.0" text="Velocity" />
+                  <Button layoutX="22.0" layoutY="562.0" mnemonicParsing="false" onAction="#onDeletePlanet" prefHeight="30.0" prefWidth="200.0" text="Delete" />
+                  <Button layoutX="22.0" layoutY="522.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Trace" />
+                  <Slider fx:id="radiusSlider" layoutX="22.0" layoutY="383.0" min="1.0" prefHeight="33.0" prefWidth="191.0" showTickLabels="true" />
+                  <Slider fx:id="massSlider" layoutX="22.0" layoutY="452.0" max="1000.0" min="1.0" prefHeight="33.0" prefWidth="191.0" showTickLabels="true" />
+                  <Label layoutX="22.0" layoutY="353.0" text="Radius:" />
+                  <Label layoutX="22.0" layoutY="425.0" text="Mass:" />
+               </children>
+            </AnchorPane>
+        </items>
       </SplitPane>
-   </top>
+   </center>
 </BorderPane>
