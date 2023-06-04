@@ -59,20 +59,14 @@ public class AddObjectController {
 
     public PlanetSprite getNewObject() {
 
-        try {
-
-            sprite =  new PlanetSprite(
-                    nameField.getText(),
-                    objectColorPicker.getValue(),
-                    Double.parseDouble(radiusField.getText()),
-                    new PVector(Double.parseDouble(xPositionField.getText()), this.canvas.getHeight() - Double.parseDouble(yPositionField.getText())),
-                    new PVector(Double.parseDouble(xVelocityField.getText()), -Double.parseDouble(yVelocityField.getText())),
-                    Double.parseDouble(massField.getText())
-            );
-        }
-        catch (NumberFormatException e) {
-            new Alert(Alert.AlertType.ERROR, "Hai inserito un valore non valido!").showAndWait();
-        }
+        sprite =  new PlanetSprite(
+                nameField.getText(),
+                objectColorPicker.getValue(),
+                Double.parseDouble(radiusField.getText()),
+                new PVector(Double.parseDouble(xPositionField.getText()), this.canvas.getHeight() - Double.parseDouble(yPositionField.getText())),
+                new PVector(Double.parseDouble(xVelocityField.getText()), -Double.parseDouble(yVelocityField.getText())),
+                Double.parseDouble(massField.getText())
+        );
 
         return sprite;
 

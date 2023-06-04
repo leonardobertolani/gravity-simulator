@@ -102,22 +102,12 @@ public class SimulatorWindowController {
     @FXML
     public void initializeSimulation() {
 
-        double h = simulationPane.getHeight();
-        double w = simulationPane.getWidth();
-
         physicalObjects = new ArrayList<>();
         initialObjectConfiguration = new ArrayList<>();
 
         GraphicsContext gc = drawCanvas.getGraphicsContext2D();
         gc.setStroke(Color.WHITE);
 
-
-        //physicalObjects.add(new PlanetSprite("ef", Color.CYAN, 10, new PVector(400, 300), new PVector(0, 1), 100));
-        //physicalObjects.add(new PlanetSprite("gnof", Color.ORANGE, 10, new PVector(600, 300), new PVector(0, -1), 100));
-        //physicalObjects.add(new PlanetSprite(Color.GREEN, new PVector(300, 200), new PVector(0, 0), 200));
-        //physicalObjects.add(new PlanetSprite(Color.YELLOW, new PVector(500, 200), new PVector(-1, 0), 100));
-        //physicalObjects.add(new PlanetSprite(Color.GREEN, new PVector(800, 400), new PVector(-1, 0.33333), 5));
-        //selectedPlanet = physicalObjects.get(0);
 
         // Generating and adding a default object
         PlanetSprite newObject = new PlanetSprite("AlphaCentauri", Color.GOLDENROD, 30, new PVector(300, 300), new PVector(0, 0), 200);
@@ -128,14 +118,15 @@ public class SimulatorWindowController {
 
         });
         selectedPlanetIndex = 0;
-
         generateDefaultPhysicalObject(newObject);
 
+
+        // Storing its initial position in the initialObjectConfiguration List
         newObject = new PlanetSprite(newObject);
         initialObjectConfiguration.add(newObject);
 
 
-        // Initialising the sliders
+        // Initialising the mass and radius sliders
         radiusSlider.valueProperty().addListener(((observable, oldValue, newValue) -> {
             if(physicalObjects.size() != 0) {
                 physicalObjects.get(selectedPlanetIndex).setRadius(newValue.doubleValue());
@@ -152,26 +143,31 @@ public class SimulatorWindowController {
 
     private void mainLoop() {
         // Do simulation stuff
-        //for(Iterator<BouncingSprite> iterator = physicalObjects.iterator(); iterator.hasNext(); ) {
 
         physicalObjects.forEach(s -> {
-            s.update();
+            s.update(drawCanvas);
             s.display();
             updatePlanetInfo();
         });
         applyGravitationalForce(physicalObjects);
-        //initialObjectConfiguration.forEach(s -> System.out.println(s));
+
     }
 
 
     /**
-     * Function called when the user clicks on a planet
+     * Display info about the clicked planet on the right side panel
      */
     public void updatePlanetInfo() {
 
-        this.planetNameLabel.setText(physicalObjects.get(selectedPlanetIndex).getName());
+        // setting the name
+        this.planetNameLabel.setText(physicalObjects.get(selectedPlanetIndex).getId());
+
+        // setting the drawing
+        this.planetCanvas.getGraphicsContext2D().clearRect(0, 0, planetCanvas.getWidth(), planetCanvas.getHeight());
         this.planetCanvas.getGraphicsContext2D().setFill(((Shape)physicalObjects.get(selectedPlanetIndex).getView()).getFill());
         this.planetCanvas.getGraphicsContext2D().fillOval(50, 50, 100, 100);
+
+        // setting the properties
         this.planetPositionLabel.setText(String.format("Position: (x: %.2f, y: %.2f)", physicalObjects.get(selectedPlanetIndex).getLocation().x, drawCanvas.getHeight() - physicalObjects.get(selectedPlanetIndex).getLocation().y));
         this.planetVelocityLabel.setText(String.format("Velocity: (x: %.2f, y: %.2f)", physicalObjects.get(selectedPlanetIndex).getVelocity().x, -physicalObjects.get(selectedPlanetIndex).getVelocity().y));
         this.radiusSlider.setValue(physicalObjects.get(selectedPlanetIndex).getRadius());
@@ -179,6 +175,11 @@ public class SimulatorWindowController {
 
     }
 
+    /**
+     * Calculate and add the total force applied to any planet by using the
+     * Newton's laws of motion (gravitation and second law).
+     * @param sprites the planets to which apply gravitation
+     */
     private void applyGravitationalForce(List<PlanetSprite> sprites) {
 
         PVector totalForce = new PVector();
@@ -210,10 +211,14 @@ public class SimulatorWindowController {
 
         stopSimulation();
         restoreObjects();
-
+        onClearAll();
     }
 
 
+    @FXML
+    void onClearAll() {
+        drawCanvas.getGraphicsContext2D().clearRect(0, 0, drawCanvas.getWidth(), drawCanvas.getHeight());
+    }
 
 
     /* ---------------------------------- LEFT SIDE PANEL ---------------------------- */
@@ -232,6 +237,9 @@ public class SimulatorWindowController {
     }
 
 
+    /**
+     * Restore the initial position of the planets
+     */
     public void restoreObjects() {
 
         List<PlanetSprite> newLink = new ArrayList<>();
@@ -295,10 +303,12 @@ public class SimulatorWindowController {
 
                 generateDefaultPhysicalObject(newObject);
 
-                // Adding a new reference of the object to the initial configuration set
-                newObject = controller.getNewObject();
-                initialObjectConfiguration.add(newObject);
-                //}
+                // Adding the same object to the initialObjectConfiguration List to save its initial position
+                initialObjectConfiguration.add(controller.getNewObject());
+
+                // Getting the index of the last object added and showing it off
+                selectedPlanetIndex = physicalObjects.size() - 1;
+                updatePlanetInfo();
 
             }
 
@@ -309,6 +319,10 @@ public class SimulatorWindowController {
     }
 
 
+    /**
+     * Manages all the stuff required to add another object to the simulation
+     * @param sprite the planet to be added to the simulation
+     */
     public void generateDefaultPhysicalObject(PlanetSprite sprite) {
         physicalObjects.add(sprite);
         simulationPane.getChildren().add(sprite);
@@ -351,12 +365,9 @@ public class SimulatorWindowController {
     }
 
 
-    public void tracePlanets() {
-        physicalObjects.forEach(s -> {
-            if(s.isTracing()) {
-
-            }
-        });
+    @FXML
+    public void onTrace() {
+        physicalObjects.get(selectedPlanetIndex).toggleTrace();
     }
 
 }

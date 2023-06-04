@@ -14,9 +14,9 @@
       <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="TOP_RIGHT">
          <children>
             <Button fx:id="simulationButton" layoutX="25.0" layoutY="70.0" mnemonicParsing="false" onAction="#onSimulate" prefHeight="30.0" prefWidth="150.0" text="Simulate" />
-            <Button layoutX="25.0" layoutY="190.0" mnemonicParsing="false" onAction="#onAddNewObject" prefHeight="30.0" prefWidth="150.0" text="Add Planet" />
-            <Button layoutX="25.0" layoutY="250.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Planet List" />
+            <Button layoutX="25.0" layoutY="190.0" mnemonicParsing="false" onAction="#onAddNewObject" prefHeight="30.0" prefWidth="150.0" text="Add Planet..." />
             <Button layoutX="25.0" layoutY="130.0" mnemonicParsing="false" onAction="#restartSimulation" prefHeight="30.0" prefWidth="150.0" text="Reset" />
+            <Button layoutX="25.0" layoutY="250.0" mnemonicParsing="false" onAction="#onClearAll" prefHeight="30.0" prefWidth="150.0" text="Clear all orbits" />
          </children>
       </AnchorPane>
    </left>
@@ -39,7 +39,7 @@
                   <Label fx:id="planetPositionLabel" layoutX="22.0" layoutY="282.0" text="Position" />
                   <Label fx:id="planetVelocityLabel" layoutX="22.0" layoutY="312.0" text="Velocity" />
                   <Button layoutX="22.0" layoutY="562.0" mnemonicParsing="false" onAction="#onDeletePlanet" prefHeight="30.0" prefWidth="200.0" text="Delete" />
-                  <Button layoutX="22.0" layoutY="522.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Trace" />
+                  <Button layoutX="22.0" layoutY="522.0" mnemonicParsing="false" onAction="#onTrace" prefHeight="30.0" prefWidth="200.0" text="Trace" />
                   <Slider fx:id="radiusSlider" layoutX="22.0" layoutY="383.0" min="1.0" prefHeight="33.0" prefWidth="191.0" showTickLabels="true" />
                   <Slider fx:id="massSlider" layoutX="22.0" layoutY="452.0" max="1000.0" min="1.0" prefHeight="33.0" prefWidth="191.0" showTickLabels="true" />
                   <Label layoutX="22.0" layoutY="353.0" text="Radius:" />
