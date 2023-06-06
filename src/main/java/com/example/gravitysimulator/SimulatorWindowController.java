@@ -113,12 +113,14 @@ public class SimulatorWindowController {
         PlanetSprite newObject = new PlanetSprite("AlphaCentauri", Color.GOLDENROD, 30, new PVector(300, 300), new PVector(0, 0), 200);
         newObject.setOnMouseClicked(event -> {
             selectedPlanetIndex = physicalObjects.indexOf((PlanetSprite) event.getSource());
-            System.out.println(selectedPlanetIndex);
             updatePlanetInfo();
 
         });
-        selectedPlanetIndex = 0;
         generateDefaultPhysicalObject(newObject);
+
+        // Selecting it in the right panel
+        selectedPlanetIndex = 0;
+        updatePlanetInfo();
 
 
         // Storing its initial position in the initialObjectConfiguration List
@@ -212,6 +214,7 @@ public class SimulatorWindowController {
         stopSimulation();
         restoreObjects();
         onClearAll();
+        updatePlanetInfo();
     }
 
 
@@ -248,7 +251,6 @@ public class SimulatorWindowController {
             PlanetSprite newObject = new PlanetSprite(b);
             newObject.setOnMouseClicked(event -> {
                 selectedPlanetIndex = physicalObjects.indexOf((PlanetSprite) event.getSource());
-                System.out.println(selectedPlanetIndex);
                 updatePlanetInfo();
             });
             newLink.add(newObject);
@@ -297,7 +299,6 @@ public class SimulatorWindowController {
                 PlanetSprite newObject = controller.getNewObject();
                 newObject.setOnMouseClicked(event -> {
                     selectedPlanetIndex = physicalObjects.indexOf((PlanetSprite) event.getSource());
-                    System.out.println(selectedPlanetIndex);
                     updatePlanetInfo();
                 });
 
@@ -339,7 +340,7 @@ public class SimulatorWindowController {
     @FXML
     public void onDeletePlanet() {
 
-        if(physicalObjects.size() > 0) {
+        if(physicalObjects.size() > 1) {
             physicalObjects.remove(selectedPlanetIndex);
             initialObjectConfiguration.remove(selectedPlanetIndex);
             simulationPane.getChildren().remove(selectedPlanetIndex + 1);
@@ -360,6 +361,9 @@ public class SimulatorWindowController {
                 updatePlanetInfo();
             }
 
+        }
+        else {
+            new Alert(Alert.AlertType.WARNING, "You cannot delete all the planets!").showAndWait();
         }
 
     }

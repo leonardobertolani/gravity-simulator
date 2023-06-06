@@ -139,7 +139,7 @@ public class PlanetSprite extends Sprite {
     public PVector computeGravitationalForce(PlanetSprite sprite) {
 
 
-        if(location.distance(sprite.location) <= 5) {//getRadius() + sprite.getRadius()) {
+        if(location.distance(sprite.location) <= getRadius() + sprite.getRadius()) {
             return new PVector(0, 0);
         }
 
